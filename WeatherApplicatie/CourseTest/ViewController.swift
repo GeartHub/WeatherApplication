@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 struct OpenForecast: Decodable {
     //CityInfo
@@ -19,7 +20,6 @@ struct OpenForecast: Decodable {
     struct WeatherForecastList: Decodable {
         let main: WeatherForecast
         let dt_txt: String
-        let dt: Int
         struct WeatherForecast: Decodable {
             let temp_max: Double
         }
@@ -31,7 +31,8 @@ struct OpenForecast: Decodable {
     }
 }
 class ViewController: UIViewController, UISearchBarDelegate {
-    //UI city stuff
+    //All the UI
+    //UI city
     @IBOutlet weak var citySearchBar: UISearchBar!
     @IBOutlet weak var cityNameLabel: UILabel!
     
@@ -96,11 +97,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 //Checking cityname
                 let city = decodedJSONForecast.city.name
                 
-                //Checking date
-                
-                
-               // let date2 = NSDate(timeIntervalSince1970: TimeInterval(decodedJSONForecast.list[0].dt))
-                
                 //Checking for Weather of Today
                 let todayTemp = decodedJSONForecast.list[0].main.temp_max
                 let todayWeatherDescription = decodedJSONForecast.list[0].weather[0].description
@@ -116,6 +112,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
                     }
                     c += 1
                 }
+                print(arrayPlacement)
                 //Checking for Tempature
                 let dayOneTemp = decodedJSONForecast.list[arrayPlacement[0]].main.temp_max
                 let dayTwoTemp = decodedJSONForecast.list[arrayPlacement[1]].main.temp_max
@@ -170,57 +167,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
             }
             
         }.resume()
-        
-        // What I did first with other API and other way of changing Image
-        
-       /* let openWeatherMapJsonUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&lang=en&units=metric&APPID=2ece9f6600e72596fdc7be53987f63b1"
-        guard let url = URL(string: openWeatherMapJsonUrl) else
-     { return }
-        
-        URLSession.shared.dataTask(with: url) { (data, response, err) in
-            
-            guard let data = data else{ return }
-            
-            do {
-                let decodedJSONWeather = try JSONDecoder().decode(OpenWeather.self, from: data)
-                let city = decodedJSONWeather.name
-                let temp = Int (decodedJSONWeather.main.temp)
-                let weatherImage = String (describing: decodedJSONWeather.weather[0].icon)
-                let weatherDescription = String (decodedJSONWeather.weather[0].description)
-                DispatchQueue.main.async{
-         
-                    switch weatherImage{
-                    case "01d":
-                        self.weatherImage.image = UIImage(named: "01d.png")
-                    case "02d":
-                        self.weatherImage.image = UIImage(named: "02d.png")
-                    case "03d":
-                        self.weatherImage.image = UIImage(named: "03d.png")
-                    case "04d":
-                        self.weatherImage.image = UIImage(named: "04d.png")
-                    case "09d":
-                        self.weatherImage.image = UIImage(named: "09d.png")
-                    case "10d":
-                        self.weatherImage.image = UIImage(named: "10d.png")
-                    case "11d":
-                        self.weatherImage.image = UIImage(named: "11d.png")
-                    case "13d":
-                        self.weatherImage.image = UIImage(named: "13d.png")
-                    case "50d":
-                        self.weatherImage.image = UIImage(named: "50d.png")
-                    default:
-                        break;
-                    }
-                }
-                DispatchQueue.main.async {
-                self.cityNameLabel.text = city
-                self.temperatureLabel.text = String (temp) + "° Celcius"
-                self.weatherDescriptionLabel.text = weatherDescription
-                }
-            }catch let jsonErr{
-                print("error", jsonErr)
-            }
-        }.resume()*/
     }
 }
 
