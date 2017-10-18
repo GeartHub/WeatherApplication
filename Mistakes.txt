@@ -1,4 +1,4 @@
-﻿Mistakes I made in my code
+Mistakes I made in my code
 De grootste fout die ik in mijn code heb gemaakt was het onderstaande:
 let dayOneWeatherIcon = decodedJSONForecast.list[arrayPlacement[0]].weather[0].icon
 Hierin haal ik de  naam van de icon in een String uit de api.
@@ -39,3 +39,4 @@ let dayOneWeatherDescription = decodedJSONForecast.list[1].weather[0].descriptio
 Dit was de manier dat ik de eerste versie had gecodeerd. Nu heb ik een for loop erin gezet waar ik de zoek of de date een string bevat. Deze plaats in de array wordt dan opgeslagen in een andere array en hiermee bepaal ik het voor de volgende dagen. 
 let dayThreeWeatherDescription = decodedJSONForecast.list[arrayPlacement[2]].weather[0].description
 Het probleem met dit is dat de juiste informatie niet hoeft te kloppen met het gemiddelde van een dag. Dit is de reden dat ik voor een andere API ga kiezen.
+Het opschonen van mijn code en het niet herhalen van sommige stukken komt omdat ik nog op dit moment nog niet weet hoe ik het op een andere manier moet doen. In de volgende periode wil ik dit veranderen.
