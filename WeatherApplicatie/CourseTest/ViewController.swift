@@ -9,24 +9,35 @@
 import UIKit
 import Foundation
 
-struct OpenForecast: Decodable {
-    //CityInfo
-    let city: CityName
-    struct CityName: Decodable {
+struct ApixuForecast: Decodable {
+    let location: Location
+    struct Location: Decodable {
         let name: String
     }
-    //WeatherInfo
-    let list: [WeatherForecastList]
-    struct WeatherForecastList: Decodable {
-        let main: WeatherForecast
-        let dt_txt: String
-        struct WeatherForecast: Decodable {
-            let temp_max: Double
-        }
-        let weather: [WeatherDescription]
-        struct WeatherDescription: Decodable {
-            let description: String
-            let icon: String
+    let current: CurrentWeather
+        struct CurrentWeather: Decodable{
+            let temp_c: Double
+            let condition: Condition
+            struct Condition: Decodable{
+                let icon: String
+                let text: String
+            }
+    }
+    let forecast: Forecast
+    struct Forecast:Decodable {
+        let forecastday: [forecastday]
+        struct forecastday: Decodable {
+            let date: String
+            let day: WeatherInformationDay
+            struct WeatherInformationDay:Decodable {
+                let maxtemp_c: Double
+                let mintemp_c: Double
+                let condition: Condition
+                struct Condition:Decodable {
+                    let text: String
+                    let icon: String
+                }
+            }
         }
     }
 }
@@ -37,27 +48,36 @@ class ViewController: UIViewController, UISearchBarDelegate {
     @IBOutlet weak var cityNameLabel: UILabel!
     
     //Today's weather info
+    @IBOutlet weak var dateToday: UILabel!
     @IBOutlet weak var weatherImageToday: UIImageView!
     @IBOutlet weak var temperatureLabelToday: UILabel!
     @IBOutlet weak var weatherDescriptionLabelToday: UILabel!
     
     //Day one forecast
-    @IBOutlet weak var tempatureLabelDayOne: UILabel!
+    @IBOutlet weak var dateDayOne: UILabel!
+    @IBOutlet weak var tempatureLabelHighDayOne: UILabel!
+    @IBOutlet weak var tempatureLabelLowDayOne: UILabel!
     @IBOutlet weak var weatherDescriptionLabelDayOne: UILabel!
     @IBOutlet weak var weatherImageDayOne: UIImageView!
     
     //Day two forecast
-    @IBOutlet weak var tempatureLabelDayTwo: UILabel!
+    @IBOutlet weak var dateDayTwo: UILabel!
+    @IBOutlet weak var tempatureLabelHighDayTwo: UILabel!
+    @IBOutlet weak var tempatureLabelLowDayTwo: UILabel!
     @IBOutlet weak var weatherDescriptionLabelDayTwo: UILabel!
     @IBOutlet weak var weatherImageDayTwo: UIImageView!
     
     //Day three forecast
-    @IBOutlet weak var tempatureLabelDayThree: UILabel!
+    @IBOutlet weak var dateDayThree: UILabel!
+    @IBOutlet weak var tempatureLabelHighDayThree: UILabel!
+    @IBOutlet weak var tempatureLabelLowDayThree: UILabel!
     @IBOutlet weak var weatherDescriptionLabelDayThree: UILabel!
     @IBOutlet weak var weatherImageDayThree: UIImageView!
     
     //Day four forecast
-    @IBOutlet weak var tempatureLabelDayFour: UILabel!
+    @IBOutlet weak var dateDayFour: UILabel!
+    @IBOutlet weak var tempatureLabelHighDayFour: UILabel!
+    @IBOutlet weak var tempatureLabelLowDayFour: UILabel!
     @IBOutlet weak var weatherDescriptionLabelDayFour: UILabel!
     @IBOutlet weak var weatherImageDayFour: UIImageView!
     
@@ -68,6 +88,7 @@ class ViewController: UIViewController, UISearchBarDelegate {
         GetData(cityName: "Eastermar")
         citySearchBar.showsScopeBar = true
         citySearchBar.delegate = self
+
         
     }
     
@@ -80,92 +101,113 @@ class ViewController: UIViewController, UISearchBarDelegate {
         }
     }
     func GetData(cityName: String){
+        
+        let deviceLanguage = NSLocale.preferredLanguages[0]
+        print (deviceLanguage)
+        
         // API gets requested
-        let otherOpenWeatherMapJsonURL = "https://api.openweathermap.org/data/2.5/forecast?id=524901&q=" + cityName + "&lang=en&units=metric&APPID=2ece9f6600e72596fdc7be53987f63b1"
-        guard let url2 = URL(string: otherOpenWeatherMapJsonURL) else
+        let apixuJsonUrl = "https://api.apixu.com/v1/forecast.json?key=79104d19fe3947f7aaf70734171810&days=5&q=" + cityName
+        
+        guard let apixuUrl = URL(string: apixuJsonUrl) else
         { return }
         
         //Downloading API Data
-        URLSession.shared.dataTask(with: url2) { (data2, response, errr) in
-            
+        URLSession.shared.dataTask(with: apixuUrl) { (data2, response, err) in
             guard let data2 = data2 else{ return }
             
             do {
-                //Decoding API
-                let decodedJSONForecast = try JSONDecoder().decode(OpenForecast.self, from: data2)
-                
-                //Checking cityname
-                let city = decodedJSONForecast.city.name
+                let decodedApixuJSON = try JSONDecoder().decode(ApixuForecast.self, from: data2)
+               
+                //Checking city name
+                let city = decodedApixuJSON.location.name
                 
                 //Checking for Weather of Today
-                let todayTemp = decodedJSONForecast.list[0].main.temp_max
-                let todayWeatherDescription = decodedJSONForecast.list[0].weather[0].description
-                let todayWeatherIcon = decodedJSONForecast.list[0].weather[0].icon
+                let dateToday = decodedApixuJSON.forecast.forecastday[0].date
+                let todayTemp = decodedApixuJSON.current.temp_c
+                let todayWeatherDescription = decodedApixuJSON.current.condition.text
+                let iconUrlToday = NSURL(string: "https:" + decodedApixuJSON.current.condition.icon)
                 
-                var c: Int = 0
-                var arrayPlacement: [Int] = []
-                for _ in decodedJSONForecast.list{
-                    let date = decodedJSONForecast.list[c].dt_txt
-                    if (date.range(of: "12:00:00") != nil && c >= 3)
-                    {
-                        arrayPlacement.append(c)
-                    }
-                    c += 1
-                }
-                print(arrayPlacement)
-                //Checking for Tempature
-                let dayOneTemp = decodedJSONForecast.list[arrayPlacement[0]].main.temp_max
-                let dayTwoTemp = decodedJSONForecast.list[arrayPlacement[1]].main.temp_max
-                let dayThreeTemp = decodedJSONForecast.list[arrayPlacement[2]].main.temp_max
-                let dayFourTemp = decodedJSONForecast.list[arrayPlacement[3]].main.temp_max
+                //Checking Weather for tomorrow
+                let dateDayOne = decodedApixuJSON.forecast.forecastday[1].date
+                let highTempDayOne = decodedApixuJSON.forecast.forecastday[1].day.maxtemp_c
+                let lowTempDayOne = decodedApixuJSON.forecast.forecastday[1].day.mintemp_c
+                let dayOneWeatherDescription = decodedApixuJSON.forecast.forecastday[1].day.condition.text
+                let dayOneWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[1].day.condition.icon)
                 
-                //Checking for Weather Description
-                let dayOneWeatherDescription = decodedJSONForecast.list[arrayPlacement[0]].weather[0].description
-                let dayTwoWeatherDescription = decodedJSONForecast.list[arrayPlacement[1]].weather[0].description
-                let dayThreeWeatherDescription = decodedJSONForecast.list[arrayPlacement[2]].weather[0].description
-                let dayFourWeatherDescription = decodedJSONForecast.list[arrayPlacement[3]].weather[0].description
+                //Checking Weather for day 2
+                let dateDayTwo = decodedApixuJSON.forecast.forecastday[2].date
+                let highTempDayTwo = decodedApixuJSON.forecast.forecastday[2].day.maxtemp_c
+                let lowTempDayTwo = decodedApixuJSON.forecast.forecastday[2].day.mintemp_c
+                let dayTwoWeatherDescription = decodedApixuJSON.forecast.forecastday[2].day.condition.text
+                let dayTwoWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[2].day.condition.icon)
                 
-                //Checking for Weather Icon
-                let dayOneWeatherIcon = decodedJSONForecast.list[arrayPlacement[0]].weather[0].icon
-                let dayTwoWeatherIcon = decodedJSONForecast.list[arrayPlacement[1]].weather[0].icon
-                let dayThreeWeatherIcon = decodedJSONForecast.list[arrayPlacement[2]].weather[0].icon
-                let dayFourWeatherIcon = decodedJSONForecast.list[arrayPlacement[3]].weather[0].icon
-
+                //Checking Weather for day 3
+                let dateDayThree = decodedApixuJSON.forecast.forecastday[3].date
+                let highTempDayThree = decodedApixuJSON.forecast.forecastday[3].day.maxtemp_c
+                let lowTempDayThree = decodedApixuJSON.forecast.forecastday[3].day.mintemp_c
+                let dayThreeWeatherDescription = decodedApixuJSON.forecast.forecastday[3].day.condition.text
+                let dayThreeWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[3].day.condition.icon)
+                
+                //Checking Weather for day 4
+                let dateDayFour = decodedApixuJSON.forecast.forecastday[4].date
+                let highTempDayFour = decodedApixuJSON.forecast.forecastday[4].day.maxtemp_c
+                let lowTempDayFour = decodedApixuJSON.forecast.forecastday[4].day.mintemp_c
+                let dayFourWeatherDescription = decodedApixuJSON.forecast.forecastday[4].day.condition.text
+                let dayFourWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[4].day.condition.icon)
+                
                 DispatchQueue.main.async {
-                    //Adding Info to labels and Image to UIImage
+                    
+                    //Insert city name into label
                     self.cityNameLabel.text = city
                     
-                    //Weather Today
+                    //Weather of today
+                    self.dateToday.text = dateToday
                     self.temperatureLabelToday.text = String (describing: abs(Int(todayTemp))) + "°C"
-                    self.weatherImageToday.image = UIImage(named: todayWeatherIcon + ".png")
                     self.weatherDescriptionLabelToday.text = todayWeatherDescription
-
+                    if let iconDataToday = NSData(contentsOf: iconUrlToday! as URL) {
+                        self.weatherImageToday.image = UIImage(data: iconDataToday as Data)
+                    }
                     
-                    //Weather Tomorrow
-                    self.tempatureLabelDayOne.text = String (describing: abs(Int(dayOneTemp))) + "°C"
-                    self.weatherImageDayOne.image = UIImage(named: dayOneWeatherIcon + ".png")
+                    //Weather of tomorrow
+                    self.dateDayOne.text = dateDayOne
+                    self.tempatureLabelHighDayOne.text = String (describing: abs(Int(highTempDayOne))) + "°C"
+                    self.tempatureLabelLowDayOne.text = String (describing: abs(Int(lowTempDayOne))) + "°C"
                     self.weatherDescriptionLabelDayOne.text = dayOneWeatherDescription
+                    if let iconDataDayOne = NSData(contentsOf: dayOneWeatherIcon! as URL){
+                        self.weatherImageDayOne.image = UIImage(data: iconDataDayOne as Data)
+                    }
                     
-                    //Weather Day 2
-                    self.tempatureLabelDayTwo.text = String (describing: abs(Int(dayTwoTemp))) + "°C"
-                    self.weatherImageDayTwo.image = UIImage(named: dayTwoWeatherIcon + ".png")
+                    //Weather day 2
+                    self.dateDayTwo.text = dateDayTwo
+                    self.tempatureLabelHighDayTwo.text = String (describing: abs(Int(highTempDayTwo))) + "°C"
+                    self.tempatureLabelLowDayTwo.text = String (describing: abs(Int(lowTempDayTwo))) + "°C"
                     self.weatherDescriptionLabelDayTwo.text = dayTwoWeatherDescription
+                    if let iconDataDayTwo = NSData(contentsOf: dayTwoWeatherIcon! as URL){
+                        self.weatherImageDayTwo.image = UIImage(data: iconDataDayTwo as Data)
+                    }
                     
-                    //Weather Day 3
-                    self.tempatureLabelDayThree.text = String (describing: abs(Int(dayThreeTemp))) + "°C"
-                    self.weatherImageDayThree.image = UIImage(named: dayThreeWeatherIcon + ".png")
+                    //Weather day 3
+                    self.dateDayThree.text = dateDayThree
+                    self.tempatureLabelHighDayThree.text = String (describing: abs(Int(highTempDayThree))) + "°C"
+                    self.tempatureLabelLowDayThree.text = String (describing: abs(Int(lowTempDayThree))) + "°C"
                     self.weatherDescriptionLabelDayThree.text = dayThreeWeatherDescription
+                    if let iconDataDayThree = NSData(contentsOf: dayThreeWeatherIcon! as URL){
+                        self.weatherImageDayThree.image = UIImage(data: iconDataDayThree as Data)
+                    }
                     
-                    //Weather Day 4
-                    self.tempatureLabelDayFour.text = String (describing: abs(Int(dayFourTemp))) + "°C"
-                    self.weatherImageDayFour.image = UIImage(named: dayFourWeatherIcon + ".png")
+                    //Weather day 4
+                    self.dateDayFour.text = dateDayFour
+                    self.tempatureLabelHighDayFour.text = String (describing: abs(Int(highTempDayFour))) + "°C"
+                    self.tempatureLabelLowDayFour.text = String (describing: abs(Int(lowTempDayFour))) + "°C"
                     self.weatherDescriptionLabelDayFour.text = dayFourWeatherDescription
+                    if let iconDataDayFour = NSData(contentsOf: dayFourWeatherIcon! as URL){
+                        self.weatherImageDayFour.image = UIImage(data: iconDataDayFour as Data)
+                    }
                     
                 }
             }catch let jsonErr{
                 print("error", jsonErr)
             }
-            
         }.resume()
     }
 }
