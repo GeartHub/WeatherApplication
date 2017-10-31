@@ -33,10 +33,19 @@ self.weatherImageToday.image = UIImage(named: todayWeatherIcon + ".png")
 Een beter manier om dit te doen is door de image gelijk te veranderen aan de hand van de naam in de API. Dit kreeg ik als feedback van Heerco en hij hielp mij erbij om dit beter te schrijven.
 
 
-Een fout die der op dit moment nog in staat is dat er veel hard-coded staat. 
+Een fout die er op dit moment nog in staat is dat er veel hard-coded staat. 
 Ik had namelijk het weer van vandaag erin gezet en dan met een vaste waarde binnen de array de informatie van de andere dagen opgezocht. Maar de plaats van de juiste informatie veranderd elke 3 uur.  De juiste informatie die ik probeer te krijgen is de temperatuur die het om 12 uur middags zal zijn voor de aankomende dagen. Deze de plaats van de informatie gaat -1 in de array.
 let dayOneWeatherDescription = decodedJSONForecast.list[1].weather[0].description
 Dit was de manier dat ik de eerste versie had gecodeerd. Nu heb ik een for loop erin gezet waar ik de zoek of de date een string bevat. Deze plaats in de array wordt dan opgeslagen in een andere array en hiermee bepaal ik het voor de volgende dagen. 
 let dayThreeWeatherDescription = decodedJSONForecast.list[arrayPlacement[2]].weather[0].description
 Het probleem met dit is dat de juiste informatie niet hoeft te kloppen met het gemiddelde van een dag. Dit is de reden dat ik voor een andere API ga kiezen.
 Het opschonen van mijn code en het niet herhalen van sommige stukken komt omdat ik nog op dit moment nog niet weet hoe ik het op een andere manier moet doen. In de volgende periode wil ik dit veranderen.
+
+In de herfstvakantie ben ik van API geswitcht. Dit heb ik gedaan omdat de nieuwe API mij de informatie, die ik in mijn app wil gebruiken, beter voorziet. Het is duidelijker uit te lezen in de code. Ik hoef hierdoor geen For Loop te gebruiken om de locatie van de hoogste temperatuur te vinden. Dit werkte met de oude API ook niet heel goed.
+
+Feedback van mijn ouders
+- We willen meerdere dagen kunnen bekijken. Voltooid
+- Datums erbij. Voltooid
+- Hoogste en laagste temperatuur. Voltooid
+- In het Nederlands, want snap niet precies wat er nu staat. Is mogelijk maar dat kan dan niet veranderd
+- 
