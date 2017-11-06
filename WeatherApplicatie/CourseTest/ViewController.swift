@@ -42,6 +42,12 @@ struct ApixuForecast: Decodable {
     }
 }
 class ViewController: UIViewController, UISearchBarDelegate {
+    var dateToday2: String = ""
+    var dateArray: [String] = []
+    var highTempatureArray: [Double] = []
+    var lowTempatureArray: [Double] = []
+    var weatherDesciptionArray: [String] = []
+    var weatherIconArray: [String] = []
     //All the UI
     //UI city
     @IBOutlet weak var citySearchBar: UISearchBar!
@@ -85,10 +91,9 @@ class ViewController: UIViewController, UISearchBarDelegate {
     override func viewDidLoad() {
         //Opening of Application
         super.viewDidLoad()
-        GetData(cityName: "Eastermar")
+        getData(cityName: "Eastermar")
         citySearchBar.showsScopeBar = true
         citySearchBar.delegate = self
-
         
     }
     
@@ -96,15 +101,11 @@ class ViewController: UIViewController, UISearchBarDelegate {
         //Search button clicked
         searchBar.resignFirstResponder()
         if let locationString = searchBar.text, !locationString.isEmpty{
-            GetData(cityName: locationString)
+            getData(cityName: locationString)
             searchBar.text = ""
         }
     }
-    func GetData(cityName: String){
-        
-        let deviceLanguage = NSLocale.preferredLanguages[0]
-        print (deviceLanguage)
-        
+    func getData(cityName: String){
         // API gets requested
         let apixuJsonUrl = "https://api.apixu.com/v1/forecast.json?key=79104d19fe3947f7aaf70734171810&days=5&q=" + cityName
         
@@ -122,88 +123,80 @@ class ViewController: UIViewController, UISearchBarDelegate {
                 let city = decodedApixuJSON.location.name
                 
                 //Checking for Weather of Today
+                var i: Int = 1
+                while i < 5 {
+                    let dates = decodedApixuJSON.forecast.forecastday[i].date
+                    let highTempatures = decodedApixuJSON.forecast.forecastday[i].day.maxtemp_c
+                    let lowTempatures = decodedApixuJSON.forecast.forecastday[i].day.mintemp_c
+                    let weatherDescriptions = decodedApixuJSON.forecast.forecastday[i].day.condition.text
+                    let weatherIcon = decodedApixuJSON.forecast.forecastday[i].day.condition.icon
+                    
+                    self.dateArray.append(dates)
+                    self.highTempatureArray.append(highTempatures)
+                    self.lowTempatureArray.append(lowTempatures)
+                    self.weatherDesciptionArray.append(weatherDescriptions)
+                    self.weatherIconArray.append(weatherIcon)
+                    
+                    i += 1
+                }
+                
                 let dateToday = decodedApixuJSON.forecast.forecastday[0].date
                 let todayTemp = decodedApixuJSON.current.temp_c
                 let todayWeatherDescription = decodedApixuJSON.current.condition.text
                 let iconUrlToday = NSURL(string: "https:" + decodedApixuJSON.current.condition.icon)
                 
-                //Checking Weather for tomorrow
-                let dateDayOne = decodedApixuJSON.forecast.forecastday[1].date
-                let highTempDayOne = decodedApixuJSON.forecast.forecastday[1].day.maxtemp_c
-                let lowTempDayOne = decodedApixuJSON.forecast.forecastday[1].day.mintemp_c
-                let dayOneWeatherDescription = decodedApixuJSON.forecast.forecastday[1].day.condition.text
-                let dayOneWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[1].day.condition.icon)
-                
-                //Checking Weather for day 2
-                let dateDayTwo = decodedApixuJSON.forecast.forecastday[2].date
-                let highTempDayTwo = decodedApixuJSON.forecast.forecastday[2].day.maxtemp_c
-                let lowTempDayTwo = decodedApixuJSON.forecast.forecastday[2].day.mintemp_c
-                let dayTwoWeatherDescription = decodedApixuJSON.forecast.forecastday[2].day.condition.text
-                let dayTwoWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[2].day.condition.icon)
-                
-                //Checking Weather for day 3
-                let dateDayThree = decodedApixuJSON.forecast.forecastday[3].date
-                let highTempDayThree = decodedApixuJSON.forecast.forecastday[3].day.maxtemp_c
-                let lowTempDayThree = decodedApixuJSON.forecast.forecastday[3].day.mintemp_c
-                let dayThreeWeatherDescription = decodedApixuJSON.forecast.forecastday[3].day.condition.text
-                let dayThreeWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[3].day.condition.icon)
-                
-                //Checking Weather for day 4
-                let dateDayFour = decodedApixuJSON.forecast.forecastday[4].date
-                let highTempDayFour = decodedApixuJSON.forecast.forecastday[4].day.maxtemp_c
-                let lowTempDayFour = decodedApixuJSON.forecast.forecastday[4].day.mintemp_c
-                let dayFourWeatherDescription = decodedApixuJSON.forecast.forecastday[4].day.condition.text
-                let dayFourWeatherIcon = NSURL(string: "https:" + decodedApixuJSON.forecast.forecastday[4].day.condition.icon)
-                
                 DispatchQueue.main.async {
-                    
-                    //Insert city name into label
                     self.cityNameLabel.text = city
-                    
-                    //Weather of today
                     self.dateToday.text = dateToday
                     self.temperatureLabelToday.text = String (describing: abs(Int(todayTemp))) + "°C"
                     self.weatherDescriptionLabelToday.text = todayWeatherDescription
                     if let iconDataToday = NSData(contentsOf: iconUrlToday! as URL) {
                         self.weatherImageToday.image = UIImage(data: iconDataToday as Data)
                     }
-                    
-                    //Weather of tomorrow
-                    self.dateDayOne.text = dateDayOne
-                    self.tempatureLabelHighDayOne.text = String (describing: abs(Int(highTempDayOne))) + "°C"
-                    self.tempatureLabelLowDayOne.text = String (describing: abs(Int(lowTempDayOne))) + "°C"
-                    self.weatherDescriptionLabelDayOne.text = dayOneWeatherDescription
-                    if let iconDataDayOne = NSData(contentsOf: dayOneWeatherIcon! as URL){
-                        self.weatherImageDayOne.image = UIImage(data: iconDataDayOne as Data)
+                    var b: Int = 0
+                    while b < 4 {
+                        switch b{
+                        case 0:
+                            self.dateDayOne.text = self.dateArray[b]
+                            self.tempatureLabelHighDayOne.text = String (describing: abs(Int(self.highTempatureArray[b]))) + "°C"
+                            self.tempatureLabelLowDayOne.text = String (describing: abs (Int (self.lowTempatureArray[b]))) + "°C"
+                            self.weatherDescriptionLabelDayOne.text = self.weatherDesciptionArray[b]
+                            let iconUrlDayOne = NSURL(string: "https:" + self.weatherIconArray[b])
+                            if let iconDataDayOne = NSData(contentsOf: iconUrlDayOne! as URL){
+                                self.weatherImageDayOne.image = UIImage(data: iconDataDayOne as Data)
+                            }
+                        case 1:
+                            self.dateDayTwo.text = self.dateArray[b]
+                            self.tempatureLabelHighDayTwo.text = String (describing: abs(Int(self.highTempatureArray[b]))) + "°C"
+                            self.tempatureLabelLowDayTwo.text = String (describing: abs (Int (self.lowTempatureArray[b]))) + "°C"
+                            self.weatherDescriptionLabelDayTwo.text = self.weatherDesciptionArray[b]
+                            let iconUrlDayTwo = NSURL(string: "https:" + self.weatherIconArray[b])
+                            if let iconDataDayTwo = NSData(contentsOf: iconUrlDayTwo! as URL){
+                                self.weatherImageDayTwo.image = UIImage(data: iconDataDayTwo as Data)
+                            }
+                        case 2:
+                            self.dateDayThree.text = self.dateArray[b]
+                            self.tempatureLabelHighDayThree.text = String (describing: abs(Int(self.highTempatureArray[b]))) + "°C"
+                            self.tempatureLabelLowDayThree.text = String (describing: abs (Int (self.lowTempatureArray[b]))) + "°C"
+                            self.weatherDescriptionLabelDayThree.text = self.weatherDesciptionArray[b]
+                            let iconUrlDayThree = NSURL(string: "https:" + self.weatherIconArray[b])
+                            if let iconDataDayThree = NSData(contentsOf: iconUrlDayThree! as URL){
+                                self.weatherImageDayThree.image = UIImage(data: iconDataDayThree as Data)
+                            }
+                        case 3:
+                            self.dateDayFour.text = self.dateArray[b]
+                            self.tempatureLabelHighDayFour.text = String (describing: abs(Int(self.highTempatureArray[b]))) + "°C"
+                            self.tempatureLabelLowDayFour.text = String (describing: abs (Int (self.lowTempatureArray[b]))) + "°C"
+                            self.weatherDescriptionLabelDayFour.text = self.weatherDesciptionArray[b]
+                            let iconUrlDayFour = NSURL(string: "https:" + self.weatherIconArray[b])
+                            if let iconDataDayFour = NSData(contentsOf: iconUrlDayFour! as URL){
+                                self.weatherImageDayFour.image = UIImage(data: iconDataDayFour as Data)
+                            }
+                        default:
+                            break
+                        }
+                        b += 1
                     }
-                    
-                    //Weather day 2
-                    self.dateDayTwo.text = dateDayTwo
-                    self.tempatureLabelHighDayTwo.text = String (describing: abs(Int(highTempDayTwo))) + "°C"
-                    self.tempatureLabelLowDayTwo.text = String (describing: abs(Int(lowTempDayTwo))) + "°C"
-                    self.weatherDescriptionLabelDayTwo.text = dayTwoWeatherDescription
-                    if let iconDataDayTwo = NSData(contentsOf: dayTwoWeatherIcon! as URL){
-                        self.weatherImageDayTwo.image = UIImage(data: iconDataDayTwo as Data)
-                    }
-                    
-                    //Weather day 3
-                    self.dateDayThree.text = dateDayThree
-                    self.tempatureLabelHighDayThree.text = String (describing: abs(Int(highTempDayThree))) + "°C"
-                    self.tempatureLabelLowDayThree.text = String (describing: abs(Int(lowTempDayThree))) + "°C"
-                    self.weatherDescriptionLabelDayThree.text = dayThreeWeatherDescription
-                    if let iconDataDayThree = NSData(contentsOf: dayThreeWeatherIcon! as URL){
-                        self.weatherImageDayThree.image = UIImage(data: iconDataDayThree as Data)
-                    }
-                    
-                    //Weather day 4
-                    self.dateDayFour.text = dateDayFour
-                    self.tempatureLabelHighDayFour.text = String (describing: abs(Int(highTempDayFour))) + "°C"
-                    self.tempatureLabelLowDayFour.text = String (describing: abs(Int(lowTempDayFour))) + "°C"
-                    self.weatherDescriptionLabelDayFour.text = dayFourWeatherDescription
-                    if let iconDataDayFour = NSData(contentsOf: dayFourWeatherIcon! as URL){
-                        self.weatherImageDayFour.image = UIImage(data: iconDataDayFour as Data)
-                    }
-                    
                 }
             }catch let jsonErr{
                 print("error", jsonErr)
