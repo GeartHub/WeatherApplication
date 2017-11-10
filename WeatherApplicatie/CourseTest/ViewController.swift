@@ -42,7 +42,7 @@ struct ApixuForecast: Decodable {
     }
 }
 class ViewController: UIViewController, UISearchBarDelegate {
-    var dateToday2: String = ""
+
     var dateArray: [String] = []
     var highTempatureArray: [Double] = []
     var lowTempatureArray: [Double] = []
@@ -54,7 +54,6 @@ class ViewController: UIViewController, UISearchBarDelegate {
     @IBOutlet weak var cityNameLabel: UILabel!
     
     //Today's weather info
-    @IBOutlet weak var dateToday: UILabel!
     @IBOutlet weak var weatherImageToday: UIImageView!
     @IBOutlet weak var temperatureLabelToday: UILabel!
     @IBOutlet weak var weatherDescriptionLabelToday: UILabel!
@@ -106,6 +105,12 @@ class ViewController: UIViewController, UISearchBarDelegate {
         }
     }
     func getData(cityName: String){
+        
+        dateArray = [String]()
+        highTempatureArray = [Double]()
+        lowTempatureArray = [Double]()
+        weatherDesciptionArray = [String]()
+        weatherIconArray = [String]()
         // API gets requested
         let apixuJsonUrl = "https://api.apixu.com/v1/forecast.json?key=79104d19fe3947f7aaf70734171810&days=5&q=" + cityName
         
@@ -139,15 +144,13 @@ class ViewController: UIViewController, UISearchBarDelegate {
                     
                     i += 1
                 }
-                
-                let dateToday = decodedApixuJSON.forecast.forecastday[0].date
+                print (self.dateArray, self.highTempatureArray)
                 let todayTemp = decodedApixuJSON.current.temp_c
                 let todayWeatherDescription = decodedApixuJSON.current.condition.text
                 let iconUrlToday = NSURL(string: "https:" + decodedApixuJSON.current.condition.icon)
                 
                 DispatchQueue.main.async {
                     self.cityNameLabel.text = city
-                    self.dateToday.text = dateToday
                     self.temperatureLabelToday.text = String (describing: abs(Int(todayTemp))) + "°C"
                     self.weatherDescriptionLabelToday.text = todayWeatherDescription
                     if let iconDataToday = NSData(contentsOf: iconUrlToday! as URL) {
