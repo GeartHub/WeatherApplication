@@ -12,6 +12,8 @@
 		E21CAC4F1F8E081100990A10 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E21CAC4D1F8E081100990A10 /* Main.storyboard */; };
 		E21CAC511F8E081100990A10 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E21CAC501F8E081100990A10 /* Assets.xcassets */; };
 		E21CAC541F8E081100990A10 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E21CAC521F8E081100990A10 /* LaunchScreen.storyboard */; };
+		E29CCA6F1FCD8753003D0C81 /* ApixuForecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29CCA6E1FCD8753003D0C81 /* ApixuForecast.swift */; };
+		E29CCA731FCD9187003D0C81 /* ForecastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E29CCA721FCD9187003D0C81 /* ForecastCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,8 @@
 		E21CAC501F8E081100990A10 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E21CAC531F8E081100990A10 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E21CAC551F8E081100990A10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E29CCA6E1FCD8753003D0C81 /* ApixuForecast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApixuForecast.swift; sourceTree = "<group>"; };
+		E29CCA721FCD9187003D0C81 /* ForecastCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForecastCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,12 +58,14 @@
 		E21CAC481F8E081100990A10 /* CourseTest */ = {
 			isa = PBXGroup;
 			children = (
+				E29CCA721FCD9187003D0C81 /* ForecastCell.swift */,
 				E21CAC491F8E081100990A10 /* AppDelegate.swift */,
 				E21CAC4B1F8E081100990A10 /* ViewController.swift */,
 				E21CAC4D1F8E081100990A10 /* Main.storyboard */,
 				E21CAC501F8E081100990A10 /* Assets.xcassets */,
 				E21CAC521F8E081100990A10 /* LaunchScreen.storyboard */,
 				E21CAC551F8E081100990A10 /* Info.plist */,
+				E29CCA6E1FCD8753003D0C81 /* ApixuForecast.swift */,
 			);
 			path = CourseTest;
 			sourceTree = "<group>";
@@ -136,6 +142,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E29CCA731FCD9187003D0C81 /* ForecastCell.swift in Sources */,
+				E29CCA6F1FCD8753003D0C81 /* ApixuForecast.swift in Sources */,
 				E21CAC4C1F8E081100990A10 /* ViewController.swift in Sources */,
 				E21CAC4A1F8E081100990A10 /* AppDelegate.swift in Sources */,
 			);
