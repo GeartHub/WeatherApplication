@@ -45,6 +45,7 @@ struct ApixuForecast: Decodable {
 class ViewController: UIViewController, UISearchBarDelegate, UICollectionViewDataSource {
 
     
+    @IBOutlet weak var BackgroundImage: UIImageView!
     var dateArray: [String] = []
     var averageTempatureArray: [Double] = []
     var weatherDesciptionArray: [String] = []
@@ -102,7 +103,7 @@ class ViewController: UIViewController, UISearchBarDelegate, UICollectionViewDat
                 
                 //Checking for Weather of Today
                 var i: Int = 1
-                while i < 4 {
+                while i < 5 {
                     let dates = decodedApixuJSON.forecast.forecastday[i].date
                     let averageTempature = decodedApixuJSON.forecast.forecastday[i].day.avgtemp_c
                     let weatherDescriptions = decodedApixuJSON.forecast.forecastday[i].day.condition.text
@@ -115,6 +116,7 @@ class ViewController: UIViewController, UISearchBarDelegate, UICollectionViewDat
                     
                     i += 1
                 }
+
                 let todayTemp = decodedApixuJSON.current.temp_c
                 let todayWeatherDescription = decodedApixuJSON.current.condition.text
                 let iconUrlToday = NSURL(string: "https:" + decodedApixuJSON.current.condition.icon)
@@ -124,6 +126,12 @@ class ViewController: UIViewController, UISearchBarDelegate, UICollectionViewDat
                     self.cityNameLabel.text = city
                     self.temperatureLabelToday.text = String (describing: abs(Int(todayTemp))) + "°C"
                     self.weatherDescriptionLabelToday.text = todayWeatherDescription
+                        if self.weatherDescriptionLabelToday.text?.range(of: "rain") != nil {
+                            self.BackgroundImage.image = UIImage(named: "not-sunny")
+                        }
+                        if self.weatherDescriptionLabelToday.text?.range(of: "Sunny") != nil{
+                            self.BackgroundImage.image = UIImage(named: "sunny")
+                        }
                     if let iconDataToday = NSData(contentsOf: iconUrlToday! as URL) {
                         self.weatherImageToday.image = UIImage(data: iconDataToday as Data)
                     }
