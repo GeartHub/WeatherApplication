@@ -9,39 +9,6 @@
 import UIKit
 import Foundation
 
-struct ApixuForecast: Decodable {
-    public var location: Location
-    struct Location: Decodable {
-        let name: String
-    }
-    let current: CurrentWeather
-    struct CurrentWeather: Decodable{
-        let temp_c: Double
-        let condition: Condition
-        struct Condition: Decodable{
-            let icon: String
-            let text: String
-        }
-    }
-    let forecast: Forecast
-    struct Forecast:Decodable {
-        public let forecastday: [forecastday]
-        struct forecastday: Decodable {
-            let date: String
-            let day: WeatherInformationDay
-            struct WeatherInformationDay:Decodable {
-                let avgtemp_c: Double
-                let condition: Condition
-                struct Condition:Decodable {
-                    let text: String
-                    let icon: String
-                }
-            }
-        }
-    }
-}
-
-
 class ViewController: UIViewController, UISearchBarDelegate, UICollectionViewDataSource {
 
     
@@ -126,12 +93,16 @@ class ViewController: UIViewController, UISearchBarDelegate, UICollectionViewDat
                     self.cityNameLabel.text = city
                     self.temperatureLabelToday.text = String (describing: abs(Int(todayTemp))) + "°C"
                     self.weatherDescriptionLabelToday.text = todayWeatherDescription
-                        if self.weatherDescriptionLabelToday.text?.range(of: "rain") != nil {
-                            self.BackgroundImage.image = UIImage(named: "not-sunny")
-                        }
-                        if self.weatherDescriptionLabelToday.text?.range(of: "Sunny") != nil{
-                            self.BackgroundImage.image = UIImage(named: "sunny")
-                        }
+                    if self.weatherDescriptionLabelToday.text?.range(of: "show") != nil || self.weatherDescriptionLabelToday.text?.range(of: "rain") != nil {
+                        self.BackgroundImage.image = UIImage(named: "WeatherRainy")
+                    } else if self.weatherDescriptionLabelToday.text?.range(of: "sunny") != nil {
+                        self.BackgroundImage.image = UIImage(named: "WeatherSunny")
+                    } else if self.weatherDescriptionLabelToday.text?.range(of: "cloud") != nil {
+                        self.BackgroundImage.image = UIImage(named: "WeatherCloudy")
+                    }else {
+                        self.BackgroundImage.image = UIImage(named: "WeatherSunny")
+                    }
+                    
                     if let iconDataToday = NSData(contentsOf: iconUrlToday! as URL) {
                         self.weatherImageToday.image = UIImage(data: iconDataToday as Data)
                     }
@@ -161,9 +132,6 @@ class ViewController: UIViewController, UISearchBarDelegate, UICollectionViewDat
         }
         
         return cell
-        //indexPath.row; // 0, 1, 2
-        //var cell = UICollectionViewCell.new;
-        //cell.dateLabel.text = dateArray[indexPath.row];
     }
 }
 
